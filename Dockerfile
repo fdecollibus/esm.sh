@@ -1,5 +1,5 @@
 # --- build server from source code
-FROM golang:1.23-alpine AS builder
+FROM registry.redhat.io/rhel8/go-toolset AS builder
 
 ARG SERVER_VERSION="v136"
 
