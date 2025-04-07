@@ -10,7 +10,7 @@ WORKDIR /tmp/esm.sh
 # Build the esmd binary
 RUN go build -ldflags="-s -w -X 'github.com/esm-dev/esm.sh/server.VERSION=${SERVER_VERSION}'" -o esmd server/esmd/main.go
 # --- Stage 2: Obtain the Deno binary ---
-FROM docker.io/denoland/deno:bin-2.1.4 AS deno
+FROM ext-registry-1-docker-io/denoland/deno:bin-2.1.4 AS deno
 # --- Stage 3: Create the final image ---
 FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 # Install necessary packages
