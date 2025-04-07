@@ -1,41 +1,67 @@
 # --- build server from source code
+
 FROM registry.redhat.io/rhel8/go-toolset AS builder
 
 ARG SERVER_VERSION="v136"
 
-RUN apk update && apk add --no-cache git
+# Install necessary packages using dnf
+
+RUN dnf install -y git && \
+
+    dnf clean all
+
+# Clone the repository
+
 RUN git clone --branch $SERVER_VERSION --depth 1 https://github.com/esm-dev/esm.sh /tmp/esm.sh
 
 WORKDIR /tmp/esm.sh
+
+# Build the application
+
 RUN go build -ldflags="-s -w -X 'github.com/esm-dev/esm.sh/server.VERSION=${SERVER_VERSION}'" -o esmd server/esmd/main.go
+
 # ---
 
-FROM alpine:latest
+# Use Red Hat UBI Minimal as the base image
 
-# install git (use to fetch repo tags from Github)
-RUN apk update && apk add --no-cache git
+FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 
-# add user and working directory
-RUN addgroup -g 1000 esm && adduser -u 1000 -G esm -D esm && mkdir /esmd && chown -R esm:esm /esmd
+# Install necessary packages using microdnf
 
-# copy esmd & deno build
+RUN microdnf install -y git shadow-utils && \
+
+    microdnf clean all
+
+# Add user and create working directory
+
+RUN groupadd -g 1000 esm && \
+
+    useradd -u 1000 -g esm -d /esmd -m esm
+
+# Copy esmd binary from the builder stage
+
 COPY --from=builder /tmp/esm.sh/esmd /bin/esmd
-COPY --from=denoland/deno:bin-2.1.4 --chown=esm:esm /deno /esmd/bin/deno
 
-# deno desn't provider musl build yet, the hack below makes the gnu build working in alpine
-# see https://github.com/denoland/deno_docker/blob/main/alpine.dockerfile
-COPY --from=gcr.io/distroless/cc --chown=root:root --chmod=755 /lib/*-linux-gnu/* /usr/local/lib/
-COPY --from=gcr.io/distroless/cc --chown=root:root --chmod=755 /lib/ld-linux-* /lib/
-RUN mkdir /lib64 && ln -s /usr/local/lib/ld-linux-* /lib64/
-ENV LD_LIBRARY_PATH="/usr/local/lib"
+# Copy deno binary from the official deno image
 
-# server configuration
+COPY --from=denoland/deno:bin-2.1.4 /deno /esmd/bin/deno
+
+# Set environment variables
+
 ENV ESMPORT="8080"
+
 ENV ESMDIR="/esmd"
 
-# switch to non-root user
+# Set permissions
+
+RUN chown -R esm:esm /esmd
+
+# Switch to non-root user
+
 USER esm
 
 EXPOSE 8080
+
 WORKDIR /esmd
-CMD ["esmd"]
+
+CMD ["/bin/esmd"] 
