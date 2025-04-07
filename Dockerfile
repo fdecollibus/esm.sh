@@ -2,8 +2,8 @@
 FROM registry.redhat.io/rhel8/go-toolset AS builder
 ARG SERVER_VERSION="v136"
 # Install necessary packages
-RUN sudo dnf install -y git && \
-   sudo dnf clean all
+RUN  dnf install -y git && \
+   dnf clean all
 # Clone the repository
 RUN git clone --branch $SERVER_VERSION --depth 1 https://github.com/esm-dev/esm.sh /tmp/esm.sh
 WORKDIR /tmp/esm.sh
@@ -13,7 +13,7 @@ RUN go build -ldflags="-s -w -X 'github.com/esm-dev/esm.sh/server.VERSION=${SERV
 
 FROM registry.access.redhat.com/ubi8/ubi:latest
 # Install necessary packages
-RUN sudo dnf install -y curl unzip && sudo dnf clean all
+RUN dnf install -y curl unzip && dnf clean all
 # Set Deno version
 ENV DENO_VERSION=2.1.4
 # Download and install Deno
