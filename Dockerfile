@@ -8,8 +8,11 @@ ARG SERVER_VERSION="v136"
 # Install necessary packages
 RUN dnf install -y git && \
     dnf clean all
+
+# Inject AXA root CA and Proxy CA certificate into RHEL based base image
 COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
 RUN update-ca-trust extract
+ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/cert.pem
 
 # Clone the repository
 RUN git clone --branch $SERVER_VERSION --depth 1 https://github.com/esm-dev/esm.sh /tmp/esm.sh
@@ -24,12 +27,13 @@ FROM registry.access.redhat.com/ubi8/ubi:latest
 # Set to root user for package installation
 USER root
 
-COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
-RUN update-ca-trust extract
-
 # Install necessary packages
 RUN dnf install -y curl unzip && dnf clean all
 
+# Inject AXA root CA and Proxy CA certificate into RHEL based base image
+COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
+RUN update-ca-trust extract
+ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/cert.pem
 # Set Deno version
 ENV DENO_VERSION=2.1.4
 
@@ -49,11 +53,13 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 # Set to root user for package installation
 USER root
 
-COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
-RUN update-ca-trust extract
 # Install necessary packages
 RUN microdnf install -y git shadow-utils && \
     microdnf clean all
+# Inject AXA root CA and Proxy CA certificate into RHEL based base image
+COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
+RUN update-ca-trust extract
+ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/cert.pem
 
 # Add user and create working directory
 RUN groupadd -g 1000 esm && \
