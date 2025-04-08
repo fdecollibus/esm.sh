@@ -8,6 +8,8 @@ ARG SERVER_VERSION="v136"
 # Install necessary packages
 RUN dnf install -y git && \
     dnf clean all
+COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
+RUN update-ca-trust extract
 
 # Clone the repository
 RUN git clone --branch $SERVER_VERSION --depth 1 https://github.com/esm-dev/esm.sh /tmp/esm.sh
@@ -21,6 +23,9 @@ FROM registry.access.redhat.com/ubi8/ubi:latest
 
 # Set to root user for package installation
 USER root
+
+COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
+RUN update-ca-trust extract
 
 # Install necessary packages
 RUN dnf install -y curl unzip && dnf clean all
@@ -44,6 +49,8 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 # Set to root user for package installation
 USER root
 
+COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
+RUN update-ca-trust extract
 # Install necessary packages
 RUN microdnf install -y git shadow-utils && \
     microdnf clean all
