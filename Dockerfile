@@ -27,9 +27,9 @@ RUN go version || echo "Go is not installed"
 # Clone the repository
 RUN git clone --branch $SERVER_VERSION --depth 1 https://github.com/esm-dev/esm.sh /tmp/esm.sh
 WORKDIR /tmp/esm.sh
-
+RUN ls -lhatr
 # Build the esmd binary
-RUN go build -ldflags="-s -w -X 'github.com/esm-dev/esm.sh/server.VERSION=${SERVER_VERSION}'" -o esmd server/esmd/main.go
+RUN go build -ldflags="-s -w -X 'github.com/esm-dev/esm.sh/server.VERSION=${SERVER_VERSION}'" -o esmd ./server/esmd/main.go
 
 # --- Stage 2: Obtain the Deno binary ---
 FROM registry.access.redhat.com/ubi8/ubi:latest
