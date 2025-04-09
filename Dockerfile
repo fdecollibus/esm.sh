@@ -9,6 +9,10 @@ ARG SERVER_VERSION="v136"
 RUN dnf install -y git && \
     dnf clean all
 
+RUN cat /certs/AXA-Enterprise-Root-CA.pem
+
+RUN cat /certs/AXA-Proxy-ROOT-CA.pem
+
 # Inject AXA root CA and Proxy CA certificate into RHEL based base image
 COPY [ "/certs/AXA-Enterprise-Root-CA.pem", "/certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
 RUN update-ca-trust extract
