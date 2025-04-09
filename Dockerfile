@@ -22,6 +22,8 @@ RUN echo "I am here"  && \
 RUN update-ca-trust extract
 ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/cert.pem
 
+RUN go version || echo "Go is not installed"
+
 # Clone the repository
 RUN git clone --branch $SERVER_VERSION --depth 1 https://github.com/esm-dev/esm.sh /tmp/esm.sh
 WORKDIR /tmp/esm.sh
