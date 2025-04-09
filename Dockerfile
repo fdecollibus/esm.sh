@@ -10,7 +10,7 @@ RUN dnf install -y git && \
     dnf clean all
 
 # Inject AXA root CA and Proxy CA certificate into RHEL based base image
-COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
+COPY [ "/certs/AXA-Enterprise-Root-CA.pem", "/certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
 RUN update-ca-trust extract
 ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/cert.pem
 
@@ -31,7 +31,7 @@ USER root
 RUN dnf install -y curl unzip && dnf clean all
 
 # Inject AXA root CA and Proxy CA certificate into RHEL based base image
-COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
+COPY [ "/certs/AXA-Enterprise-Root-CA.pem", "/certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
 RUN update-ca-trust extract
 ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/cert.pem
 # Set Deno version
@@ -57,7 +57,7 @@ USER root
 RUN microdnf install -y git shadow-utils && \
     microdnf clean all
 # Inject AXA root CA and Proxy CA certificate into RHEL based base image
-COPY [ "certs/AXA-Enterprise-Root-CA.pem", "certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
+COPY [ "/certs/AXA-Enterprise-Root-CA.pem", "/certs/AXA-Proxy-ROOT-CA.pem", "/etc/pki/ca-trust/source/anchors/" ]
 RUN update-ca-trust extract
 ENV REQUESTS_CA_BUNDLE=/etc/pki/tls/cert.pem
 
