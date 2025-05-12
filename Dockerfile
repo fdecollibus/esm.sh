@@ -1,5 +1,5 @@
 # --- Stage 1: Build the esmd binary ---
-FROM registry.redhat.io/rhel8/go-toolset AS builder
+FROM registry.redhat.io/rhel9/go-toolset AS builder
 
 # Set to root user for package installation
 USER root
@@ -29,7 +29,7 @@ RUN ls -lhatr /tmp/esm.sh/server
 RUN go build -ldflags="-s -w -X 'github.com/esm-dev/esm.sh/server.VERSION=${SERVER_VERSION}'" -o esmd main.go
 
 # --- Stage 2: Obtain the Deno binary ---
-FROM registry.access.redhat.com/ubi8/ubi:latest
+FROM registry.access.redhat.com/ubi9/ubi:latest
 
 # Set to root user for package installation
 USER root
@@ -56,7 +56,7 @@ RUN curl -fsSL https://github.com/denoland/deno/releases/download/v${DENO_VERSIO
 RUN deno --version
 
 # --- Stage 3: Create the final image ---
-FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 
 # Set to root user for package installation
 USER root
