@@ -35,7 +35,7 @@ FROM registry.access.redhat.com/ubi9/ubi:latest
 USER root
 
 # Install necessary packages
-#RUN dnf install -y unzip && dnf clean all
+RUN dnf install -y unzip && dnf clean all
 
 # Inject AXA root CA and Proxy CA certificate into RHEL based base image
 RUN cp /certs/AXA-Enterprise-Root-CA.pem /etc/pki/ca-trust/source/anchors/ && \
